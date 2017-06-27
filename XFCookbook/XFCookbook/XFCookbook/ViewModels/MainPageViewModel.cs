@@ -4,37 +4,47 @@ using Prism.Navigation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Input;
+using Xamarin.Forms;
 
 namespace XFCookbook.ViewModels
 {
-    public class MainPageViewModel : BindableBase, INavigationAware
+    public class MainPageViewModel : BindableBase
     {
-        private string _title;
-        public string Title
-        {
-            get { return _title; }
-            set { SetProperty(ref _title, value); }
-        }
-
         public MainPageViewModel()
         {
-
+            LoadCommand = new Command(async () =>
+            {
+                var result = await EvaluateJavascript("document.getElementById('emailTxt');");
+                WebViewSource = new UrlWebViewSource
+                {
+                    Url = SourceUrl
+                };
+            });
         }
 
-        public void OnNavigatedFrom(NavigationParameters parameters)
+        private string _sourceUrl = "https://smartfind.peopleadmin.com";
+        public string SourceUrl
         {
-
+            get { return _sourceUrl; }
+            set { SetProperty(ref _sourceUrl, value); }
         }
 
-        public void OnNavigatingTo(NavigationParameters parameters)
+        private Func<string, Task<string>> _evaluateJavascript;
+        public Func<string, Task<string>> EvaluateJavascript
         {
-
+            get { return _evaluateJavascript; }
+            set { _evaluateJavascript = value; }
         }
 
-        public void OnNavigatedTo(NavigationParameters parameters)
+        private WebViewSource _webViewSource;
+        public WebViewSource WebViewSource
         {
-            if (parameters.ContainsKey("title"))
-                Title = (string)parameters["title"] + " and Prism";
+            get { return _webViewSource; }
+            set { SetProperty(ref _webViewSource, value); }
         }
+
+        public ICommand LoadCommand { get; }
     }
 }

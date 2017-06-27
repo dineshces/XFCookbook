@@ -8,6 +8,7 @@ using Xamarin.Forms;
 using XFCookbook.Droid.Renderers;
 
 [assembly: ExportRenderer(typeof(ExtendedWebView), typeof(ExtendedWebViewRenderer))]
+
 namespace XFCookbook.Droid.Renderers
 {
     public class ExtendedWebViewRenderer : WebViewRenderer
@@ -24,7 +25,11 @@ namespace XFCookbook.Droid.Renderers
                     var response = string.Empty;
                     Device.BeginInvokeOnMainThread(() =>
                     {
-                        Control?.EvaluateJavascript(js, new JavascriptCallback((r) => { response = r; reset.Set(); }));
+                        Control?.EvaluateJavascript(js, new JavascriptCallback((r) =>
+                        {
+                            response = r;
+                            reset.Set();
+                        }));
                     });
                     await Task.Run(() => { reset.WaitOne(); });
                     return response;
@@ -40,10 +45,10 @@ namespace XFCookbook.Droid.Renderers
         }
 
         private Action<string> _callback;
+
         public void OnReceiveValue(Java.Lang.Object value)
         {
             _callback?.Invoke(Convert.ToString(value));
         }
     }
-}
 }
